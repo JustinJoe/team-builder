@@ -31,7 +31,7 @@ export default function App() {
   const [editing, setEditing] = useState(null)
   // ✨ Create a third state to track the values of the inputs
   const [details, setDetails] = useState(newMember);
-
+  
   const {fname, lname, bio} = details;
 
   useEffect(() => {
@@ -40,6 +40,13 @@ export default function App() {
     // with the data belonging to the member with id 2.
     // On the other hand, if the `editing` state changes back to null
     // then we need to reset the form back to empty values
+    if (editing === null) {
+      setDetails(newMember)
+    } else {
+      const member = members.find(member => member.id === editing)
+      setDetails(member)
+    }
+
   }, [editing])
 
   const onChange = evt => {
@@ -59,6 +66,7 @@ export default function App() {
     // ✨ Put this function inside a click handler for the <button>Edit</button>.
     // It should change the value of `editing` state to be the id of the member
     // whose Edit button was clicked
+    setEditing(id)
   }
   const submitNewMember = () => {
     // This takes the values of the form and constructs a new member object,
@@ -71,6 +79,15 @@ export default function App() {
   const editExistingMember = () => {
     // ✨ This takes the values of the form and replaces the data of the
     // member in the `members` state whose id matches the `editing` state
+    const updatedMembers = members.map(member => {
+      if (member.id === editing) {
+        return {...member, ...details}
+      } 
+      return member
+    })
+
+    setMembers(updatedMembers);
+    setEditing(null);
   }
   const onSubmit = evt => {
     // ✨ This is the submit handler for your form element.
@@ -79,7 +96,9 @@ export default function App() {
     // Don't allow the page to reload! Prevent the default behavior
     // and clean up the form after submitting
     evt.preventDefault();
-    submitNewMember();
+    
+    editing ? editExistingMember() : submitNewMember();
+    
     setDetails({...newMember, id: getId()})
   }
   return (
@@ -94,7 +113,7 @@ export default function App() {
                   <h4>{mem.fname} {mem.lname}</h4>
                   <p>{mem.bio}</p>
                 </div>
-                <button>Edit</button>
+                <button onClick={() => {edit(mem.id)}}>Edit</button>
               </div>
             ))
           }
